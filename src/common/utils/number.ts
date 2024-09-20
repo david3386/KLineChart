@@ -119,20 +119,53 @@ export function getMaxMin<D> (dataList: D[], maxKey: keyof D, minKey: keyof D): 
   return maxMin
 }
 
+let maxPrecision = 20 // 最大的精度
+
+export function setMaxPrecision (value: number): void {
+  maxPrecision = Math.max(8, value)
+}
+
 /**
  * 10为底的对数函数
  * @param value
  * @return {number}
  */
 export function log10 (value: number): number {
-  return Math.log(value) / Math.log(10)
-}
+  // return Math.log(value) / Math.log(10)
 
+  /**
+   * david:
+   *
+   * 为了兼容有负数的对数坐标轴，所以重新定义对数的求值。
+   * 因为数据有精度限制，所以不可能出现比10的-maxPrecision次方还小的数，可认为10的-maxPrecision次方接近0
+   *
+   * value为负数时，与-value在0刻度线上是对称的，0刻度的对数值是-maxPrecision，则value的对数值为((-maxPrecision * 2) - log(-value))
+   */
+  if (value === 0) {
+    return -maxPrecision
+  }
+  const logValue = Math.log(Math.abs(value)) / Math.log(10)
+
+  if (value < 0) {
+    return (-maxPrecision * 2) - logValue
+  }
+  return logValue
+}
 /**
  * 10的指数函数
  * @param value
  * @return {number}
  */
 export function index10 (value: number): number {
+  // return Math.pow(10, value)
+
+  const logValue = -maxPrecision
+  if (value === logValue) {
+    return 0
+  }
+  if (value < logValue) {
+    const diff = logValue * 2 - value
+    return -Math.pow(10, diff)
+  }
   return Math.pow(10, value)
 }

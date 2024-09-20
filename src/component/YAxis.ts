@@ -15,7 +15,7 @@
 import { YAxisType, YAxisPosition, CandleType } from '../common/Styles'
 import type Bounding from '../common/Bounding'
 import { isNumber, isValid } from '../common/utils/typeChecks'
-import { index10, log10 } from '../common/utils/number'
+import { index10, log10, setMaxPrecision } from '../common/utils/number'
 import { calcTextWidth } from '../common/utils/canvas'
 import { formatPrecision, formatThousands, formatFoldDecimal } from '../common/utils/format'
 
@@ -135,6 +135,7 @@ export default abstract class YAxisImp extends AxisImp implements YAxis {
         break
       }
       case YAxisType.Log: {
+        setMaxPrecision(precision)
         min = log10(min)
         max = log10(max)
         dif = 0.05 * index10(-precision)
@@ -280,6 +281,7 @@ export default abstract class YAxisImp extends AxisImp implements YAxis {
           break
         }
         case YAxisType.Log: {
+          setMaxPrecision(precision)
           y = this._innerConvertToPixel(log10(+value))
           v = formatPrecision(value, precision)
           break
@@ -427,6 +429,7 @@ export default abstract class YAxisImp extends AxisImp implements YAxis {
         break
       }
       case YAxisType.Log: {
+        setMaxPrecision(this.getParent().getChart().getChartStore().getPrecision().price)
         v = log10(value)
         break
       }
