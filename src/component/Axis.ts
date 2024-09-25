@@ -120,6 +120,17 @@ export default abstract class AxisImp implements Pick<AxisTemplate, 'createTicks
         }
       }
     }
+    /**
+     * david:
+     * 对数坐标轴出现负数时，添加0刻度
+     */
+    const isLog = this.getParent().getChart().getStyles().yAxis.type === 'log'
+    if (realFrom < 0 && isLog) {
+      const found = ticks.find(tick => tick.value === 0) !== null
+      if (!found) {
+        ticks.push({ text: '0', coord: 0, value: 0 })
+      }
+    }
     return ticks
   }
 
